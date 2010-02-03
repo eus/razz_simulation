@@ -141,6 +141,16 @@ const card *
 strtocard (const char *str);
 
 /**
+ * Returns the string representation of a card.
+ *
+ * @param [in] c the card.
+ *
+ * @return an immutable string if the card is valid or NULL if it is invalid.
+ */
+const char *
+cardtostr (enum card_suit_rank c);
+
+/**
  * Reclaims the memory space that was allocated for the card as well as
  * setting the pointer to NULL as a safe guard. The card to be freed
  * must be a card obtained from strtocard() or create_card(). Passing

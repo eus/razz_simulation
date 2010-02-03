@@ -16,6 +16,7 @@
  *****************************************************************************/
 
 #include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include "card.h"
 
@@ -55,6 +56,7 @@ int
 main (int argc, char **argv, char **envp)
 {
   int i;
+  int end;
   const card *c;
   card_deck *d;
   card_hand *h;
@@ -135,6 +137,11 @@ main (int argc, char **argv, char **envp)
   assert (strtorank ("ace") == ACE);
   assert (strtorank ("8") == R8);
   assert (strtorank ("K") == K);
+
+  assert (strcmp (cardtostr (SPADE_8), "S8") == 0);
+  assert (strcmp (cardtostr (CLUB_10), "C10") == 0);
+  assert (strcmp (cardtostr (SPADE_ACE), "SA") == 0);
+  assert (strcmp (cardtostr (CLUB_K), "CK") == 0);
 
   /* Deck */
   srand48 (3);
@@ -235,6 +242,31 @@ main (int argc, char **argv, char **envp)
   assert (h == NULL);
   destroy_deck (&d);
   assert (d == NULL);
+
+  /* Uniform distribution */
+  unsigned long card_count[CARD_COUNT] = {0};
+  unsigned long expected_card_count[] = {
+    997, 1044, 1011, 1022, 992, 1065, 996, 1012, 994, 1028, 1016, 996, 991,
+    948, 986, 997, 958, 1022, 1017, 1000, 1005, 974, 984, 953, 999, 1009,
+    1027, 1054, 990, 1016, 1004, 943, 986, 987, 980, 956, 1032, 1034, 994,
+    1003, 1013, 1001, 1005, 1026, 993, 968, 932, 971, 1035, 960, 1046, 1028,
+  };
+  srand48 (3);
+  end = CARD_COUNT * 1000;
+  for (i = 0; i < end; i++)
+    {
+      d = create_shuffled_deck ();
+      assert (d != NULL);
+      c = deal_from_deck (d);
+      assert (c != NULL);
+      card_count[get_card_suit_rank (c)]++;
+      destroy_deck (&d);
+      assert (d == NULL); 
+    }
+  for (i = 0; i < CARD_COUNT; i++)
+    {
+      assert (card_count[i] == expected_card_count[i]);
+    }
 
   exit (EXIT_SUCCESS);
 }

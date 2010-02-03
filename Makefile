@@ -1,6 +1,6 @@
 .PHONY: clean doc test
 
-CFLAGS := -g3
+CFLAGS := -g3 -Werror
 
 razz: razz.o card.o
 
