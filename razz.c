@@ -267,6 +267,7 @@ main (int argc, char **argv, char **envp)
 	       "The probability of getting a hand whose rank is better than\n"
 	       "\tor equal to the worst rank will be output to stdout.\n"
 	       "The range of the probability is [0.0000, 1.0000]\n");
+      exit (EXIT_FAILURE);
     }
 
   my_hand = create_hand (RAZZ_CARD_IN_HAND_COUNT, sort_card_by_rank);
