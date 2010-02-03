@@ -96,11 +96,35 @@ main (int argc, char **argv, char **envp)
   destroy_card (&c);
   assert (c == NULL);
 
-  c = strtocard ("DA");
+  c = strtocard ("dk");
   assert (c != NULL);
-  assert (get_card_suit_rank (c) == DIAMOND_ACE);
-  assert (get_card_rank (c) == ACE);
+  assert (get_card_suit_rank (c) == DIAMOND_K);
+  assert (get_card_rank (c) == K);
   assert (get_card_suit (c) == DIAMOND);
+  destroy_card (&c);
+  assert (c == NULL);
+
+  c = strtocard ("Ca");
+  assert (c != NULL);
+  assert (get_card_suit_rank (c) == CLUB_ACE);
+  assert (get_card_rank (c) == ACE);
+  assert (get_card_suit (c) == CLUB);
+  destroy_card (&c);
+  assert (c == NULL);
+
+  c = strtocard ("hJ");
+  assert (c != NULL);
+  assert (get_card_suit_rank (c) == HEART_J);
+  assert (get_card_rank (c) == J);
+  assert (get_card_suit (c) == HEART);
+  destroy_card (&c);
+  assert (c == NULL);
+
+  c = strtocard ("SQ");
+  assert (c != NULL);
+  assert (get_card_suit_rank (c) == SPADE_Q);
+  assert (get_card_rank (c) == Q);
+  assert (get_card_suit (c) == SPADE);
   destroy_card (&c);
   assert (c == NULL);
 
@@ -108,7 +132,7 @@ main (int argc, char **argv, char **envp)
   assert (c == NULL);
 
   /* Rank */
-  assert (strtorank ("ACE") == ACE);
+  assert (strtorank ("ace") == ACE);
   assert (strtorank ("8") == R8);
   assert (strtorank ("K") == K);
 
