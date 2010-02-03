@@ -18,6 +18,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <string.h>
 #include "card.h"
 
 /** A card having a particular suit and rank. */
@@ -528,6 +529,12 @@ const card *
 strtocard (const char *str)
 {
   enum card_suit_rank csr;
+  size_t char_count = strlen (str);
+
+  if (char_count != 2)
+    {
+      return NULL;
+    }
 
   switch (toupper (str[0]))
     {
@@ -555,7 +562,14 @@ strtocard (const char *str)
     case 'A':
       return create_card (csr);
     case '1':
-      return create_card (csr + 9);
+      if (char_count == 3)
+	{
+	  return create_card (csr + 9);
+	}
+      else
+	{
+	  return NULL;
+	}
     case 'J':
       return create_card (csr + 10);
     case 'Q':

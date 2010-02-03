@@ -132,6 +132,10 @@ main (int argc, char **argv, char **envp)
 
   c = strtocard ("SS");
   assert (c == NULL);
+  c = strtocard ("S0");
+  assert (c == NULL);
+  c = strtocard ("S1");
+  assert (c == NULL);
 
   /* Rank */
   assert (strtorank ("ace") == ACE);
