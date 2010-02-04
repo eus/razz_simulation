@@ -53,6 +53,117 @@ struct card_impl
 #define K_BITS (13U)
 };
 
+/**
+ * Makes a card have the desired suit and rank.
+ *
+ * @param [in] csr the desired rank and suit.
+ * @param [out] c a pointer to the memory location to write the card on.
+ */
+static void
+write_card (enum card_suit_rank csr, card *c)
+{
+  c->card = INVALID_CARD_BITS;
+
+  if (csr >= SPADE_ACE && csr <= SPADE_K)
+    {
+      c->card |= SPADE_BITS;
+    }
+  else if (csr >= HEART_ACE && csr <= HEART_K)
+    {
+      c->card |= HEART_BITS;
+    }
+  else if (csr >= DIAMOND_ACE && csr <= DIAMOND_K)
+    {
+      c->card |= DIAMOND_BITS;
+    }
+  else if (csr >= CLUB_ACE && csr <= CLUB_K)
+    {
+      c->card |= CLUB_BITS;
+    }
+
+  switch (csr)
+    {
+    case SPADE_ACE:
+    case HEART_ACE:
+    case DIAMOND_ACE:
+    case CLUB_ACE:
+      c->card |= ACE_BITS;
+      break;
+    case SPADE_2:
+    case HEART_2:
+    case DIAMOND_2:
+    case CLUB_2:
+      c->card |= R2_BITS;
+      break;
+    case SPADE_3:
+    case HEART_3:
+    case DIAMOND_3:
+    case CLUB_3:
+      c->card |= R3_BITS;
+      break;
+    case SPADE_4:
+    case HEART_4:
+    case DIAMOND_4:
+    case CLUB_4:
+      c->card |= R4_BITS;
+      break;
+    case SPADE_5:
+    case HEART_5:
+    case DIAMOND_5:
+    case CLUB_5:
+      c->card |= R5_BITS;
+      break;
+    case SPADE_6:
+    case HEART_6:
+    case DIAMOND_6:
+    case CLUB_6:
+      c->card |= R6_BITS;
+      break;
+    case SPADE_7:
+    case HEART_7:
+    case DIAMOND_7:
+    case CLUB_7:
+      c->card |= R7_BITS;
+      break;
+    case SPADE_8:
+    case HEART_8:
+    case DIAMOND_8:
+    case CLUB_8:
+      c->card |= R8_BITS;
+      break;
+    case SPADE_9:
+    case HEART_9:
+    case DIAMOND_9:
+    case CLUB_9:
+      c->card |= R9_BITS;
+      break;
+    case SPADE_10:
+    case HEART_10:
+    case DIAMOND_10:
+    case CLUB_10:
+      c->card |= R10_BITS;
+      break;
+    case SPADE_J:
+    case HEART_J:
+    case DIAMOND_J:
+    case CLUB_J:
+      c->card |= J_BITS;
+      break;
+    case SPADE_Q:
+    case HEART_Q:
+    case DIAMOND_Q:
+    case CLUB_Q:
+      c->card |= Q_BITS;
+      break;
+    case SPADE_K:
+    case HEART_K:
+    case DIAMOND_K:
+    case CLUB_K:
+      c->card |= K_BITS;
+      break;
+    }
+}
+
 struct card_collection;
 
 /** A collection of cards. */
@@ -342,8 +453,8 @@ struct card_hand_impl
 /** A deck of cards. */
 struct card_deck_impl
 {
-  struct card_collection *dealt_cards; /**< Cards that have been dealt. */
-  struct card_collection *cards; /**< The cards in deck. */
+  char card_count; /**< The number of cards in the deck. */
+  card cards[CARD_COUNT]; /**< The cards in the deck. */
 };
 
 enum card_suit_rank
@@ -415,106 +526,7 @@ create_card (enum card_suit_rank csr)
       return NULL;
     }
 
-  c->card = INVALID_CARD_BITS;
-
-  if (csr >= SPADE_ACE && csr <= SPADE_K)
-    {
-      c->card |= SPADE_BITS;
-    }
-  else if (csr >= HEART_ACE && csr <= HEART_K)
-    {
-      c->card |= HEART_BITS;
-    }
-  else if (csr >= DIAMOND_ACE && csr <= DIAMOND_K)
-    {
-      c->card |= DIAMOND_BITS;
-    }
-  else if (csr >= CLUB_ACE && csr <= CLUB_K)
-    {
-      c->card |= CLUB_BITS;
-    }
-
-  switch (csr)
-    {
-    case SPADE_ACE:
-    case HEART_ACE:
-    case DIAMOND_ACE:
-    case CLUB_ACE:
-      c->card |= ACE_BITS;
-      break;
-    case SPADE_2:
-    case HEART_2:
-    case DIAMOND_2:
-    case CLUB_2:
-      c->card |= R2_BITS;
-      break;
-    case SPADE_3:
-    case HEART_3:
-    case DIAMOND_3:
-    case CLUB_3:
-      c->card |= R3_BITS;
-      break;
-    case SPADE_4:
-    case HEART_4:
-    case DIAMOND_4:
-    case CLUB_4:
-      c->card |= R4_BITS;
-      break;
-    case SPADE_5:
-    case HEART_5:
-    case DIAMOND_5:
-    case CLUB_5:
-      c->card |= R5_BITS;
-      break;
-    case SPADE_6:
-    case HEART_6:
-    case DIAMOND_6:
-    case CLUB_6:
-      c->card |= R6_BITS;
-      break;
-    case SPADE_7:
-    case HEART_7:
-    case DIAMOND_7:
-    case CLUB_7:
-      c->card |= R7_BITS;
-      break;
-    case SPADE_8:
-    case HEART_8:
-    case DIAMOND_8:
-    case CLUB_8:
-      c->card |= R8_BITS;
-      break;
-    case SPADE_9:
-    case HEART_9:
-    case DIAMOND_9:
-    case CLUB_9:
-      c->card |= R9_BITS;
-      break;
-    case SPADE_10:
-    case HEART_10:
-    case DIAMOND_10:
-    case CLUB_10:
-      c->card |= R10_BITS;
-      break;
-    case SPADE_J:
-    case HEART_J:
-    case DIAMOND_J:
-    case CLUB_J:
-      c->card |= J_BITS;
-      break;
-    case SPADE_Q:
-    case HEART_Q:
-    case DIAMOND_Q:
-    case CLUB_Q:
-      c->card |= Q_BITS;
-      break;
-    case SPADE_K:
-    case HEART_K:
-    case DIAMOND_K:
-    case CLUB_K:
-      c->card |= K_BITS;
-      break;
-    }
+  write_card (csr, c);
 
   if (c->card == INVALID_CARD_BITS)
     {
@@ -823,141 +835,70 @@ destroy_hand (card_hand **h_ptr)
 int
 is_card_in_deck (enum card_suit_rank c, const card_deck *d)
 {
-  struct card_collection *itr = NULL;
-
-  while (iterate_collection (d->cards, &itr))
-    {
-      if (get_card_suit_rank (itr->c) == c)
-	{
-	  return 1;
-	}
-    }
-
-  return 0;
+  return get_card_suit_rank (&d->cards[c]) == INVALID_CARD;
 }
 
 const card *
 deal_from_deck (card_deck *d)
 {
-  /* Dealing does not remove the card from the deck so that the user can use
-   * the card without caring for memory management. The card will be freed
-   * when the deck is destroyed.
-   */
-  struct card_collection *head = d->cards;
+  unsigned long i;
+  unsigned long valid_card_idx;
+  unsigned long selected_card_idx;
+  card *c;
 
-  if (head == NULL)
+  if (d->card_count <= 0)
     {
       return NULL;
     }
 
-  if (head == head->next) /* the last card */
-    {
-      d->cards = NULL;
-    }
-  else
-    {
-      d->cards = head->next;
-      detach_from_collection (head);
-    }
-  append_into_collection (&d->dealt_cards, head);
+  selected_card_idx = lrand48 () % d->card_count;
 
-  return head->c;
+  valid_card_idx = 0;
+  for (i = 0; i < CARD_COUNT; i++)
+    {
+      c = &d->cards[i];
+      if (get_card_suit_rank (c) == INVALID_CARD)
+	{
+	  if (valid_card_idx == selected_card_idx)
+	    {
+	      write_card (i, c);
+	      d->card_count--;
+	      break;
+	    }
+
+	  valid_card_idx++;
+	}
+    }
+
+  return c;
 }
 
 void
 strip_card_from_deck (enum card_suit_rank c, card_deck *d)
 {
-  /* Since the user references the card not, free the card immediately. */
-  struct card_collection *itr = NULL;
+  const card *card;
 
-  while (iterate_collection (d->cards, &itr))
+  if (get_card_suit_rank (&d->cards[c]) == INVALID_CARD)
     {
-      if (get_card_suit_rank (itr->c) == c)
-	{
-	  if (d->cards == itr)
-	    {
-	      d->cards = itr->next;
-	    }
-	  remove_from_collection (&itr, destroy_card_payload);
-	  break;
-	}
+      write_card (c, &d->cards[c]);
+      d->card_count--;
     }
 }
 
 card_deck *
 create_shuffled_deck (void)
 {
-  /* 1. Creates a list of 52 cards.
-   * 2. Draws a random number n from 1 to 52.
-   * 3. Cross the n-th card from the list and insert the card at the bottom of
-   *    the deck.
-   * 4. Draws a random number n from 1 to 51.
-   * 5. Cross the n-th uncrossed card from the list and insert the card at the
-   *    bottom of the deck.
-   * 6. Continue doing so until there is only 1 card left that simply is
-   *    inserted at the bottom of the deck
-   */
   struct card_deck_impl *deck;
-  const card *c;
-  long i;
-  long card_left_count = CARD_COUNT;
-  long next_card_idx;
-  struct
-  {
-    enum card_suit_rank card;
-    uint8_t is_withdrawn;
-  }
-  card_left [CARD_COUNT]; /* [1] */
 
   deck = malloc (sizeof (*deck));
   if (deck == NULL)
     {
       return NULL;
     }
-  deck->cards = NULL;
 
-  for (i = 0; i < CARD_COUNT; i++)
-    {
-      card_left[i].card = i;
-      card_left[i].is_withdrawn = 0;
-    }
+  memset (deck, 0, sizeof (*deck));
 
-  while (card_left_count > 0)
-    {
-      long card_idx = 0;
-
-      next_card_idx = lrand48 () % card_left_count--;
-
-      for (i = 0; i < CARD_COUNT; i++)
-	{
-	  if (card_left[i].is_withdrawn)
-	    {
-	      continue;
-	    }
-
-	  if (card_idx == next_card_idx)
-	    {
-	      break;
-	    }
-
-	  card_idx++;
-	}
-
-      card_left[i].is_withdrawn = 1; /* [2] */
-      c = create_card (card_left[i].card);
-      if (c == NULL)
-	{
-	  destroy_deck (&deck);
-	  return NULL;
-	}
-      if (insert_into_collection (&deck->cards, c, sort_card_after)) /* [3] */
-	{
-	  destroy_deck (&deck);
-	  return NULL;
-	}
-    }
-
-  deck->dealt_cards = NULL;
+  deck->card_count = CARD_COUNT;
 
   return deck;
 }
@@ -970,8 +911,6 @@ destroy_deck (card_deck **d_ptr)
       return;
     }
 
-  destroy_collection (&(*d_ptr)->cards, destroy_card_payload);
-  destroy_collection (&(*d_ptr)->dealt_cards, destroy_card_payload);
   free (*d_ptr);
   *d_ptr = NULL;
 }
