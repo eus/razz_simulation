@@ -31,7 +31,7 @@ struct decided_cards
 
 int
 process_args (unsigned long *game_count,
-	      enum card_rank *worst_rank,
+	      enum card_rank *desired_rank,
 	      card_deck *deck,
 	      struct decided_cards *decided_cards,
 	      int argc,
@@ -41,7 +41,7 @@ process_args (unsigned long *game_count,
   enum card_rank rank;
   enum card_suit_rank csr;
 
-  if (argc < 6 || argc > 12)
+  if (argc < 5 || argc > 12)
     {
       fprintf (stderr, "Invalid argument count\n");
       return 1;
@@ -52,10 +52,10 @@ process_args (unsigned long *game_count,
   rank = strtorank (*argv++);
   if (rank < R5 || rank > K)
     {
-      fprintf (stderr, "Invalid worst rank (5 <= R <= K)\n");
+      fprintf (stderr, "Invalid desired rank (5 <= R <= K)\n");
       return 1;
     }
-  *worst_rank = rank;
+  *desired_rank = rank;
 
   end = 3;
   decided_cards->my_card_count = end;  
@@ -164,34 +164,69 @@ duplicated_rank_remover (void *arg, card_hand *h, unsigned long len,
   return 0;
 }
 
+/** Prints all cards in the hand. */
+int
+card_printer (void *arg, card_hand *h, unsigned long len,
+	      unsigned long pos, const card *c)
+{
+  printf ("%4s", cardtostr (get_card_suit_rank (c)));
+  return 0;
+}
+
 /**
  * Determines whether or not a particular hand has a particular rank or even
  * better.
  *
  * @param [in] hand the hand whose rank is to be determined.
- * @param [in] worst_rank the worst rank allowed.
+ * @param [in] desired_rank the desired rank.
  *
- * @return zero if the hand has a worse rank or non-zero if the hand has the
- *         desired or better rank.
+ * @return zero if the hand does not have the desired rank
+ *         or non-zero if the hand has the desired rank.
  */
 int
-is_rank_desirable (card_hand *hand, enum card_rank worst_rank)
+is_rank_desirable (card_hand *hand, enum card_rank desired_rank)
 {
   enum card_rank prev_rank;
+  unsigned long cards_count;
 
+#ifndef NDEBUG
+  iterate_hand (hand, NULL, card_printer);
+#endif
   iterate_hand (hand, &prev_rank, duplicated_rank_remover);
+#ifndef NDEBUG
+  printf (" -> ");
+  iterate_hand (hand, NULL, card_printer);
+#endif
 
-  if (count_cards_in_hand (hand) < 5) // too many pairs in hand
+  cards_count = count_cards_in_hand (hand);
+  if (cards_count < 5) // too many pairs in hand
     {
+#ifndef NDEBUG
+      printf ("\n");
+#endif
       return 0;
     }
 
-  if (get_max_rank_of_hand (hand) > worst_rank)
+#ifndef NDEBUG
+  if (cards_count > 5)
     {
-      return 0;
+      printf ("\t");
+    }
+  else
+    {
+      printf ("\t\t");
+    }
+  printf (": %2s [%2s]\n",
+	  ranktostr (get_max_rank_of_hand (hand)),
+	  ranktostr (desired_rank));
+#endif
+
+  if (get_max_rank_of_hand (hand) == desired_rank)
+    {
+      return 1;
     }
 
-  return 1;
+  return 0;
 }
 
 /**
@@ -242,21 +277,21 @@ main (int argc, char **argv, char **envp)
   unsigned long i;
   struct decided_cards decided_cards;
   unsigned long game_count;
-  enum card_rank worst_rank;
+  enum card_rank desired_rank;
   unsigned long desirable_rank_count = 0;
   card_hand *my_hand;
   card_deck *deck;
 
   srand48 (time (NULL));
 
-  if (argc < 7 || argc > 13)
+  if (argc < 6 || argc > 13)
     {
       fprintf (stderr,
-	       "Usage: razz GAME_COUNT WORST_RANK\n"
+	       "Usage: razz GAME_COUNT DESIRED_RANK\n"
 	       "\tCARD1 CARD2 CARD3\n"
-	       "\tOPP1_CARD [OPP2_CARD [... [OPP7_CARD]]]\n"
+	       "\t[OPP1_CARD [OPP2_CARD [... [OPP7_CARD]]]]\n"
 	       "\n"
-	       "You specify the worst rank with the following symbols:\n"
+	       "You specify the desired rank with the following symbols:\n"
 	       "\t5, 6, ..., 10, J, Q, K\n"
 	       "You specify a card with the following symbols:\n"
 	       "\tSA, S2, ..., S10, SJ, SQ, SK for spade ace to spade king\n"
@@ -264,8 +299,8 @@ main (int argc, char **argv, char **envp)
 	       "\tCA, C2, ..., C10, CJ, CQ, CK for club ace to spade king\n"
 	       "\tDA, D2, ..., D10, DJ, DQ, DK for diamond ace to spade king\n"
 	       "\n"
-	       "The probability of getting a hand whose rank is better than\n"
-	       "\tor equal to the worst rank will be output to stdout.\n"
+	       "The probability of getting a hand whose rank is\n"
+	       "\tequal to the desired rank will be output to stdout.\n"
 	       "The range of the probability is [0.0000, 1.0000]\n");
       exit (EXIT_FAILURE);
     }
@@ -285,7 +320,7 @@ main (int argc, char **argv, char **envp)
       exit (EXIT_FAILURE);
     }  
 
-  if (process_args (&game_count, &worst_rank, deck, &decided_cards,
+  if (process_args (&game_count, &desired_rank, deck, &decided_cards,
 		    argc - 1, &argv[1]))
     {
       destroy_hand (&my_hand);
@@ -298,7 +333,7 @@ main (int argc, char **argv, char **envp)
       reset_hand (my_hand);
       complete_hand (my_hand, &decided_cards, deck);
       
-      if (is_rank_desirable (my_hand, worst_rank))
+      if (is_rank_desirable (my_hand, desired_rank))
 	{
 	  desirable_rank_count++;
  	}

@@ -1,6 +1,6 @@
 .PHONY: clean doc test
 
-CFLAGS := -g3 -Werror
+CFLAGS := -DNDEBUG -O3 -Werror $(CFLAGS)
 
 razz: razz.o card.o
 
