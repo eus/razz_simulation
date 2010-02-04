@@ -759,11 +759,12 @@ void
 iterate_hand (card_hand *h, void *arg, card_iterator itr_fn)
 {
   struct card_collection *itr = NULL;
+  unsigned long len = h->len;
   unsigned long pos = 0;
 
   while (iterate_collection (h->cards, &itr))
     {
-      if (itr_fn (arg, h, h->len, pos, itr->c))
+      if (itr_fn (arg, h, len, pos, itr->c))
 	{
 	  break;
 	}

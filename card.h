@@ -275,6 +275,12 @@ get_max_rank_of_hand (const card_hand *h);
 
 /**
  * The callback function used to iterated the cards in a hand.
+ * The supplied len does not change throughout an iteration. It is the number of
+ * cards in the hand before the iteration starts.
+ * The supplied pos is monotonically increasing by one.
+ * If you want to get the current length or position after inserting or deleting
+ * an element during the iteration, you can inquire the supplied hand as well as
+ * keeping an external record that is marshalled inside the iterator.
  *
  * @param [in] arg your marshalled argument into the iterator.
  * @param [in] h the hand that is being iterated
