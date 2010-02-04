@@ -150,6 +150,10 @@
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">const card *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="card_8h.html#2e4c2b819a91e8bee9144f499bbeffb0">strtocard</a> (const char *str)</td></tr>
 
+<tr><td class="memItemLeft" nowrap align="right" valign="top">const char *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="card_8h.html#57191f5fd5dab4f4987570a7b098a793">cardtostr</a> (enum <a class="el" href="card_8h.html#68efe3b941ff1235ea8cd55bbb0ba123">card_suit_rank</a> c)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">const char *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="card_8h.html#b1b6278d26036eee29149c4db1eb7194">ranktostr</a> (enum <a class="el" href="card_8h.html#36ac378c9cdee18d94444923d5f807a7">card_rank</a> r)</td></tr>
+
 <tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="card_8h.html#336c1a018be51e3a2f0668c4469a836a">destroy_card</a> (const card **c_ptr)</td></tr>
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">enum <a class="el" href="card_8h.html#36ac378c9cdee18d94444923d5f807a7">card_rank</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="card_8h.html#aa69d34cdaf5b232690ef17c93c312c0">strtorank</a> (const char *str)</td></tr>
@@ -204,7 +208,7 @@ Objects and functions dealing with the 52 cards.
 <div class="memdoc">
 
 <p>
-The callback function used to iterated the cards in a hand.<p>
+The callback function used to iterated the cards in a hand. The supplied len does not change throughout an iteration. It is the number of cards in the hand before the iteration starts. The supplied pos is monotonically increasing by one. If you want to get the current length or position after inserting or deleting an element during the iteration, you can inquire the supplied hand as well as keeping an external record that is marshalled inside the iterator.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>arg</em>&nbsp;</td><td>your marshalled argument into the iterator. </td></tr>
@@ -289,6 +293,33 @@ The 52 cards. It is guaranteed that the place of the existing enum values will n
 </div>
 </div><p>
 <hr><h2>Function Documentation</h2>
+<a class="anchor" name="57191f5fd5dab4f4987570a7b098a793"></a><!-- doxytag: member="card.h::cardtostr" ref="57191f5fd5dab4f4987570a7b098a793" args="(enum card_suit_rank c)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* cardtostr           </td>
+          <td>(</td>
+          <td class="paramtype">enum <a class="el" href="card_8h.html#68efe3b941ff1235ea8cd55bbb0ba123">card_suit_rank</a>&nbsp;</td>
+          <td class="paramname"> <em>c</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Returns the string representation of a card.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>c</em>&nbsp;</td><td>the card.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>an immutable string if the card is valid or NULL if it is invalid. </dd></dl>
+
+</div>
+</div><p>
 <a class="anchor" name="9bcc81049448124647a920fde0a6efd6"></a><!-- doxytag: member="card.h::count_cards_in_hand" ref="9bcc81049448124647a920fde0a6efd6" args="(const card_hand *h)" -->
 <div class="memitem">
 <div class="memproto">
@@ -758,6 +789,33 @@ Iterates a hand invoking the callback function for each iterated card in the han
 
 </div>
 </div><p>
+<a class="anchor" name="b1b6278d26036eee29149c4db1eb7194"></a><!-- doxytag: member="card.h::ranktostr" ref="b1b6278d26036eee29149c4db1eb7194" args="(enum card_rank r)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* ranktostr           </td>
+          <td>(</td>
+          <td class="paramtype">enum <a class="el" href="card_8h.html#36ac378c9cdee18d94444923d5f807a7">card_rank</a>&nbsp;</td>
+          <td class="paramname"> <em>r</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Returns the string representation of a rank.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>r</em>&nbsp;</td><td>the rank.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>an immutable string if the rank is valid or NULL if it is invalid. </dd></dl>
+
+</div>
+</div><p>
 <a class="anchor" name="8b6d69dcf021469ec4cd9528d1b2f678"></a><!-- doxytag: member="card.h::remove_from_hand" ref="8b6d69dcf021469ec4cd9528d1b2f678" args="(card_hand *h, enum card_suit_rank c)" -->
 <div class="memitem">
 <div class="memproto">
@@ -981,7 +1039,7 @@ Returns the rank specified in the string.<p>
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Feb 3 12:13:49 2010 for RazzSimulation by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Thu Feb 4 15:54:04 2010 for RazzSimulation by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.8 </small></address>
 </body>

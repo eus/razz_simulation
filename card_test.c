@@ -142,10 +142,19 @@ main (int argc, char **argv, char **envp)
   assert (strtorank ("8") == R8);
   assert (strtorank ("K") == K);
 
+  /* Card to string */
   assert (strcmp (cardtostr (SPADE_8), "S8") == 0);
   assert (strcmp (cardtostr (CLUB_10), "C10") == 0);
   assert (strcmp (cardtostr (SPADE_ACE), "SA") == 0);
   assert (strcmp (cardtostr (CLUB_K), "CK") == 0);
+  assert (cardtostr (CARD_COUNT) == NULL);
+
+  /* Rank to string */
+  assert (strcmp (ranktostr (R8), "8") == 0);
+  assert (strcmp (ranktostr (R10), "10") == 0);
+  assert (strcmp (ranktostr (ACE), "A") == 0);
+  assert (strcmp (ranktostr (K), "K") == 0);
+  assert (ranktostr (INVALID_RANK) == NULL);
 
   /* Deck */
   srand48 (3);

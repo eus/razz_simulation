@@ -151,6 +151,16 @@ const char *
 cardtostr (enum card_suit_rank c);
 
 /**
+ * Returns the string representation of a rank.
+ *
+ * @param [in] r the rank.
+ *
+ * @return an immutable string if the rank is valid or NULL if it is invalid.
+ */
+const char *
+ranktostr (enum card_rank r);
+
+/**
  * Reclaims the memory space that was allocated for the card as well as
  * setting the pointer to NULL as a safe guard. The card to be freed
  * must be a card obtained from strtocard() or create_card(). Passing

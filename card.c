@@ -599,6 +599,21 @@ cardtostr (enum card_suit_rank c)
   return s[c / RANK_COUNT][c % RANK_COUNT];
 }
 
+const char *
+ranktostr (enum card_rank r)
+{
+  static const char *s[RANK_COUNT] = {
+    "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"
+  };
+
+  if (r < ACE || r > K)
+    {
+      return NULL;
+    }
+
+  return s[r];
+}
+
 void
 destroy_card (const card **c_ptr)
 {
