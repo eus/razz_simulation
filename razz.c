@@ -15,33 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 
+#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "card.h"
-
-#define RAZZ_CARD_IN_HAND_COUNT 7
-
-struct decided_cards
-{
-  uint8_t my_card_count; /**< The number of my cards. */
-  const card *my_cards[3]; /**< My initial three cards. */
-  uint8_t opponent_card_count; /**< The total number of opponents' cards. */
-  const card *opponent_cards[7]; /**< The initial card of the opponent. */
-};
+#include "razz_simulation.h"
 
 int
 process_args (unsigned long *game_count,
-	      enum card_rank *desired_rank,
-	      card_deck *deck,
 	      struct decided_cards *decided_cards,
 	      int argc,
 	      char **argv)
 {
   int i, end;
-  enum card_rank rank;
   enum card_suit_rank csr;
+  card_deck *deck;
 
-  if (argc < 5 || argc > 12)
+  if (argc < 4 || argc > 11)
     {
       fprintf (stderr, "Invalid argument count\n");
       return 1;
@@ -49,323 +39,173 @@ process_args (unsigned long *game_count,
 
   *game_count = atoi (*argv++);
 
-  rank = strtorank (*argv++);
-  if (rank < R5 || rank > K)
+  deck = create_shuffled_deck ();
+  if (deck == NULL)
     {
-      fprintf (stderr, "Invalid desired rank (5 <= R <= K)\n");
+      fprintf (stderr, "Cannot create a shuffled deck\n");
       return 1;
     }
-  *desired_rank = rank;
-
   end = 3;
-  decided_cards->my_card_count = end;  
+  decided_cards->my_card_count = end;
   for (i = 0; i < end; i++)
     {
+      enum card_rank my_rank;
+      enum card_suit cs = SPADE;
       const card *my_card;
 
-      if ((my_card = strtocard (*argv++)) == NULL)
+      if ((my_rank = strtorank (*argv++)) == INVALID_RANK)
 	{
-	  fprintf (stderr, "Invalid my card specification #%d\n", i + 1);
+	  fprintf (stderr, "Invalid my rank specification #%d\n", i + 1);
+	  destroy_deck (&deck);  
 	  return 1;
 	}
 
-      csr = get_card_suit_rank (my_card);
-
-      if (!is_card_in_deck (csr, deck))
+      csr = cs * RANK_COUNT + my_rank;
+      while (!is_card_in_deck (csr, deck))
 	{
-	  fprintf (stderr, "Duplicated my card specification #%d\n", i + 1);
+	  if (++cs == SUIT_COUNT)
+	    {
+	      break;
+	    }
+
+	  csr = cs * RANK_COUNT + my_rank;
+	}
+
+      if (cs == SUIT_COUNT)
+	{
+	  fprintf (stderr, "Duplicated my rank specification #%d\n", i + 1);
+	  destroy_deck (&deck);  
 	  return 1;
 	}
 
       strip_card_from_deck (csr, deck);
 
+      if ((my_card = create_card (csr)) == NULL)
+	{
+	  fprintf (stderr, "Cannot create my card #%d\n", i + 1);
+	  destroy_deck (&deck);  
+	  return 1;
+	}
       decided_cards->my_cards[i] = my_card;
     }
 
   i = 0;
   while (*argv != NULL)
     {
+      enum card_rank opponent_rank;
+      enum card_suit cs = SPADE;
       const card *opponent_card;
 
-      if ((opponent_card = strtocard (*argv++)) == NULL)
+      if ((opponent_rank = strtorank (*argv++)) == INVALID_RANK)
 	{
-	  fprintf (stderr, "Invalid opponent card specification #%d\n", i + 1);
+	  fprintf (stderr, "Invalid opponent rank specification #%d\n", i + 1);
+	  destroy_deck (&deck);  
 	  return 1;
 	}
 
-      csr = get_card_suit_rank (opponent_card);
-
-      if (!is_card_in_deck (csr, deck))
+      csr = cs * RANK_COUNT + opponent_rank;
+      while (!is_card_in_deck (csr, deck))
 	{
-	  fprintf (stderr, "Duplicated opponent card specification #%d\n",
-		   i + 1);
+	  if (++cs == SUIT_COUNT)
+	    {
+	      break;
+	    }
+
+	  csr = cs * RANK_COUNT + opponent_rank;
+	}
+
+      if (cs == SUIT_COUNT)
+	{
+	  fprintf (stderr, "Duplicated opponent rank specification #%d\n", i + 1);
+	  destroy_deck (&deck);  
 	  return 1;
 	}
 
       strip_card_from_deck (csr, deck);
 
+      if ((opponent_card = create_card (csr)) == NULL)
+	{
+	  fprintf (stderr, "Cannot create opponent card #%d\n", i + 1);
+	  destroy_deck (&deck);  
+	  return 1;
+	}
       decided_cards->opponent_cards[i] = opponent_card;
 
       i++;
     }
   decided_cards->opponent_card_count = i;
 
+  destroy_deck (&deck);
   return 0;
 }
 
-/**
- * Complete my hand with the predetermined cards and cards dealt from the deck.
- * The predetermined cards must not contain any duplicate.
- *
- * @param [in] my_hand the hand to be completed.
- * @param [in] decided_cards the predetermined cards for my hand.
- * @param [in] deck the deck from which additional cards are dealt.
- */
 void
-complete_hand (card_hand *my_hand, struct decided_cards *decided_cards,
-	       card_deck *deck)
+listener (void *arg, enum card_rank r)
 {
-  int i, end = decided_cards->my_card_count;
+  unsigned long *rank_count = arg;
 
-  for (i = 0; i < end; i++)
+  if (r != INVALID_RANK && (r < R5 || r > K))
     {
-      insert_into_hand (my_hand, decided_cards->my_cards[i]);
+      fprintf (stderr, "%s is out of range\n", ranktostr (r));
+      return;
     }
 
-  end = RAZZ_CARD_IN_HAND_COUNT - end;
-  for (i = 0; i < end; i++)
+  if (r != INVALID_RANK)
     {
-      insert_into_hand (my_hand, deal_from_deck (deck));
+      rank_count[r - R5]++;
     }
-}
-
-/** Removes a duplicated rank from a hand. */
-static enum itr_action
-duplicated_rank_remover (unsigned long len, unsigned long pos, const card *c)
-{
-  static enum card_rank prev_rank;
-  enum card_rank curr_rank = get_card_rank (c);
-
-  if (pos == 0)
-    {
-      prev_rank = curr_rank;
-      return CONTINUE;
-    }
-
-  if (prev_rank == curr_rank)
-    {
-      return REMOVE_AND_CONTINUE;
-    }
-
-  prev_rank = curr_rank;
-
-  return CONTINUE;
-}
-
-/** Keeps only the first five cards in a hand. */
-static enum itr_action
-length_trimmer (unsigned long len, unsigned long pos, const card *c)
-{
-  if (pos >= 5)
-    {
-      return REMOVE_AND_CONTINUE;
-    }
-
-  return CONTINUE;
-}
-
-/** Prints all cards in the hand. */
-static enum itr_action
-card_printer (unsigned long len, unsigned long pos, const card *c)
-{
-  printf ("%4s", cardtostr (get_card_suit_rank (c)));
-  return CONTINUE;
-}
-
-/**
- * Determines whether or not a particular hand has a particular rank or even
- * better.
- *
- * @param [in] hand the hand whose rank is to be determined.
- * @param [in] desired_rank the desired rank.
- *
- * @return zero if the hand does not have the desired rank
- *         or non-zero if the hand has the desired rank.
- */
-int
-is_rank_desirable (card_hand *hand, enum card_rank desired_rank)
-{
-  enum card_rank r;
-  unsigned long cards_count;
-
-#ifndef NDEBUG
-  iterate_hand (hand, card_printer);
-#endif
-  iterate_hand (hand, duplicated_rank_remover);
-#ifndef NDEBUG
-  printf (" -> ");
-  iterate_hand (hand, card_printer);
-#endif
-
-  cards_count = count_cards_in_hand (hand);
-  if (cards_count < 5) // too many pairs in hand
-    {
-#ifndef NDEBUG
-      printf ("\n");
-#endif
-      return 0;
-    }
-
-  iterate_hand (hand, length_trimmer);
-  r = get_max_rank_of_hand (hand);
-
-#ifndef NDEBUG
-  if (cards_count > 5)
-    {
-      printf ("\t");
-    }
-  else
-    {
-      printf ("\t\t");
-    }
-  printf ("-> ");
-  iterate_hand (hand, card_printer);
-  printf (": %2s\n",
-	  ranktostr (r));
-#endif
-
-  if (get_max_rank_of_hand (hand) == desired_rank)
-    {
-      return 1;
-    }
-
-  return 0;
-}
-
-/**
- * Strips the deck from decided cards. The given decided cards must not contain
- * any duplicate.
- *
- * @param [in] deck the deck to be stripped out.
- * @param [in] decided_cards the non-duplicated cards to be stripped out.
- */
-void
-strip_deck (card_deck *deck, struct decided_cards *decided_cards)
-{
-  int i, end;
-
-  end = decided_cards->my_card_count;
-  for (i = 0; i < end; i++)
-    {
-      strip_card_from_deck (get_card_suit_rank (decided_cards->my_cards[i]),
-			    deck);
-    }
-
-  end = decided_cards->opponent_card_count;
-  for (i = 0; i < end; i++)
-    {
-      strip_card_from_deck (get_card_suit_rank (decided_cards->opponent_cards[i]),
-			    deck);
-    }
-}
-
-/**
- * Returns the probability of getting a hand with a particular rank or better
- * in a number of simulations.
- *
- * @param [in] desirable_rank_count the count of getting the right hand.
- * @param [in] game_count the total number of simulated games.
- *
- * @return the probability.
- */
-double
-calc_probability (unsigned long desirable_rank_count, unsigned long game_count)
-{
-  return (double) desirable_rank_count / (double) game_count;
 }
 
 int
 main (int argc, char **argv, char **envp)
 {
-  unsigned long i;
+  int i;
+  int end;
   struct decided_cards decided_cards;
   unsigned long game_count;
-  enum card_rank desired_rank;
-  unsigned long desirable_rank_count = 0;
-  card_hand *my_hand;
-  card_deck *deck;
+  unsigned long rank_count[K - R5 + 1] = {0};
 
   srand48 (time (NULL));
 
-  if (argc < 6 || argc > 13)
+  if (argc < 5 || argc > 12)
     {
       fprintf (stderr,
-	       "Usage: razz GAME_COUNT DESIRED_RANK\n"
-	       "\tCARD1 CARD2 CARD3\n"
-	       "\t[OPP1_CARD [OPP2_CARD [... [OPP7_CARD]]]]\n"
+	       "Usage: razz GAME_COUNT\n"
+	       "\tRANK1 RANK2 RANK3\n"
+	       "\t[OPP1_RANK [OPP2_RANK [... [OPP7_RANK]]]]\n"
 	       "\n"
-	       "You specify the desired rank with the following symbols:\n"
-	       "\t5, 6, ..., 10, J, Q, K\n"
-	       "You specify a card with the following symbols:\n"
-	       "\tSA, S2, ..., S10, SJ, SQ, SK for spade ace to spade king\n"
-	       "\tHA, H2, ..., H10, HJ, HQ, HK for heart ace to spade king\n"
-	       "\tCA, C2, ..., C10, CJ, CQ, CK for club ace to spade king\n"
-	       "\tDA, D2, ..., D10, DJ, DQ, DK for diamond ace to spade king\n"
-	       "\n"
-	       "The probability of getting a hand whose rank is\n"
-	       "\tequal to the desired rank will be output to stdout.\n"
-	       "The range of the probability is [0.0000, 1.0000]\n");
+	       "You specify a rank with the following symbols:\n"
+	       "\tA, 2, ..., 10, J, Q, K for ace to king\n");
       exit (EXIT_FAILURE);
     }
 
-  my_hand = create_hand (RAZZ_CARD_IN_HAND_COUNT, sort_card_by_rank);
-  if (my_hand == NULL)
-    {
-      fprintf (stderr, "Cannot create a hand\n");
-      exit (EXIT_FAILURE);
-    }
-
-  deck = create_shuffled_deck ();
-  if (deck == NULL)
-    {
-      fprintf (stderr, "Cannot create a shuffled deck\n");
-      destroy_hand (&my_hand);
-      exit (EXIT_FAILURE);
-    }  
-
-  if (process_args (&game_count, &desired_rank, deck, &decided_cards,
+  if (process_args (&game_count, &decided_cards,
 		    argc - 1, &argv[1]))
     {
-      destroy_hand (&my_hand);
-      destroy_deck (&deck);
       exit (EXIT_FAILURE);
-    }  
-
-  for (i = 0; i < game_count; i++)
-    {
-      reset_hand (my_hand);
-      complete_hand (my_hand, &decided_cards, deck);
-      
-      if (is_rank_desirable (my_hand, desired_rank))
-	{
-	  desirable_rank_count++;
- 	}
-
-      destroy_deck (&deck);
-
-      deck = create_shuffled_deck ();
-      if (deck == NULL)
-	{
-	  fprintf (stderr, "Cannot create a shuffled deck\n");
-	  break;
-	}
-      strip_deck (deck, &decided_cards);
     }
 
-  destroy_hand (&my_hand);
-  destroy_deck (&deck);
+  if (simulate_razz_game (&decided_cards, game_count, rank_count, listener))
+    {
+      exit (EXIT_FAILURE);
+    }
 
-  printf ("%.4f\n", calc_probability (desirable_rank_count, i));
+  for (i = 0; i < decided_cards.my_card_count; i++)
+    {
+      destroy_card (&decided_cards.my_cards[i]);
+    }
+  for (i = 0; i < decided_cards.opponent_card_count; i++)
+    {
+      destroy_card (&decided_cards.opponent_cards[i]);
+    }
+
+  end = K - R5 + 1;
+  for (i = 0; i < end; i++)
+    {
+      printf ("%2s = %.4f\n",
+	      ranktostr (R5 + i),
+	      (double) rank_count[i] / game_count);
+    }
 
   exit (EXIT_SUCCESS);
 }

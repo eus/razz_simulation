@@ -282,6 +282,48 @@ main (int argc, char **argv, char **envp)
   destroy_deck (&d);
   assert (d == NULL);
 
+  /* Hand with 1 card */
+  srand48 (3);
+  d = create_shuffled_deck ();
+  assert (d != NULL);
+  h = create_hand (1, sort_card_by_rank);
+  assert (h != NULL);
+
+  insert_into_hand (h, deal_from_deck (d));
+  assert (count_cards_in_hand (h) == 1);
+  assert (get_max_of_hand (h) == 1);
+  assert (get_max_rank_of_hand (h) == R9);
+  remove_from_hand (h, HEART_Q);
+  remove_from_hand (h, HEART_Q);
+
+  destroy_hand (&h);
+  assert (h == NULL);
+  destroy_deck (&d);
+  assert (d == NULL);
+
+  /* Head removal */
+  srand48 (3);
+  d = create_shuffled_deck ();
+  assert (d != NULL);
+  h = create_hand (3, sort_card_by_rank);
+  assert (h != NULL);
+
+  insert_into_hand (h, deal_from_deck (d));
+  assert (get_max_rank_of_hand (h) == R9);
+  insert_into_hand (h, deal_from_deck (d));
+  assert (get_max_rank_of_hand (h) == R9);
+  insert_into_hand (h, deal_from_deck (d));
+  assert (get_max_rank_of_hand (h) == R10);
+  remove_from_hand (h, SPADE_ACE);
+  assert (get_max_rank_of_hand (h) == R10);
+  iterate_hand (h, test_sort_card_by_rank_4);
+  assert (count_cards_in_hand (h) == 2);
+
+  destroy_hand (&h);
+  assert (h == NULL);
+  destroy_deck (&d);
+  assert (d == NULL);
+
   /* Uniform distribution */
   unsigned long card_count[CARD_COUNT] = {0};
   unsigned long expected_card_count[] = {

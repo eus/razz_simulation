@@ -2,15 +2,17 @@
 
 CFLAGS := -DNDEBUG -O3 -Werror $(CFLAGS)
 
-razz: razz.o card.o
+razz: razz.o card.o razz_simulation.o
 
-card_test: card_test.o card.o
+razz.o: razz_simulation.h card.h
 
-razz.o: card.h
+razz_simulation.o: razz_simulation.h
 
 card.o: card.h
 
 card_test.o: card.h
+
+card_test: card_test.o card.o
 
 test: card_test
 	valgrind --leak-check=full ./card_test
