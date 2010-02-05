@@ -170,11 +170,15 @@ main (int argc, char **argv, char **envp)
   assert (c == NULL);
   c = strtocard ("S1");
   assert (c == NULL);
+  c = strtocard ("a2");
+  assert (c == NULL);
 
   /* Rank */
   assert (strtorank ("ace") == ACE);
   assert (strtorank ("8") == R8);
   assert (strtorank ("K") == K);
+  assert (strtorank ("10") == R10);
+  assert (strtorank ("1") == INVALID_RANK);
 
   /* Card to string */
   assert (strcmp (cardtostr (SPADE_8), "S8") == 0);

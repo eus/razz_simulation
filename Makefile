@@ -6,11 +6,11 @@ razz: razz.o card.o
 
 card_test: card_test.o card.o
 
-razz.o:
+razz.o: card.h
 
 card.o: card.h
 
-card_test.o: card.o
+card_test.o: card.h
 
 test: card_test
 	valgrind --leak-check=full ./card_test

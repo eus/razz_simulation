@@ -574,6 +574,8 @@ strtocard (const char *str)
     case 'C':
       csr = CLUB_ACE;
       break;
+    default:
+      return NULL;
     }
 
   if (str[1] >= '2' && str[1] <= '9')
@@ -666,7 +668,14 @@ strtorank (const char *str)
 	case 'A':
 	  break;
 	case '1':
-	  cr += 9;
+	  if (str[1] == '0')
+	    {
+	      cr += 9;
+	    }
+	  else
+	    {
+	      return INVALID_RANK;
+	    }
 	  break;
 	case 'J':
 	  cr += 10;
@@ -819,7 +828,6 @@ void
 iterate_hand (card_hand *h, card_iterator itr_fn)
 {
   struct card_collection *itr = NULL;
-  unsigned long len = h->len;
   unsigned long pos = 0;
   int is_stopped = 0;
 
@@ -848,7 +856,6 @@ void
 remove_from_hand (card_hand *h, enum card_suit_rank c)
 {
   struct card_collection *itr = NULL;
-  struct card_collection *entry_to_remove = NULL;
 
   while (iterate_collection (h->cards, &itr))
     {
@@ -917,11 +924,11 @@ deal_from_deck (card_deck *d)
 void
 strip_card_from_deck (enum card_suit_rank c, card_deck *d)
 {
-  const card *card;
+  card *card = &d->cards[c];
 
-  if (get_card_suit_rank (&d->cards[c]) == INVALID_CARD)
+  if (get_card_suit_rank (card) == INVALID_CARD)
     {
-      write_card (c, &d->cards[c]);
+      write_card (c, card);
       d->card_count--;
     }
 }
