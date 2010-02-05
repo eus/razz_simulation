@@ -32,8 +32,6 @@
 <tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">typedef int(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="card_8h.html#aab6014c62f3b21a6883c9a00944070a">card_sorter</a> )(const card *before, const card *new, const card *after)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef int(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="card_8h.html#b55e3ced6a7c4b217b3fa132e42eaace">card_iterator</a> )(void *arg, card_hand *h, unsigned long len, unsigned long pos, const card *c)</td></tr>
-
 <tr><td colspan="2"><br><h2>Enumerations</h2></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="card_8h.html#68efe3b941ff1235ea8cd55bbb0ba123">card_suit_rank</a> { <br>
 &nbsp;&nbsp;<b>SPADE_ACE</b>, 
@@ -139,6 +137,12 @@
 <br>
  }</td></tr>
 
+<tr><td class="memItemLeft" nowrap align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="card_8h.html#625e20669a3a26dd2243ed4537ec5145">itr_action</a> { <a class="el" href="card_8h.html#625e20669a3a26dd2243ed4537ec514549959dd441dcda75d6898cf2c68fb374">CONTINUE</a>, 
+<a class="el" href="card_8h.html#625e20669a3a26dd2243ed4537ec51459524d094809858b9e4f778763913568a">BREAK</a>, 
+<a class="el" href="card_8h.html#625e20669a3a26dd2243ed4537ec5145a8827262d2ca4c0a8f97ec95fffde8f8">REMOVE_AND_CONTINUE</a>, 
+<a class="el" href="card_8h.html#625e20669a3a26dd2243ed4537ec5145d5db3ad88fdb1b4e0b955fca2dee71e8">REMOVE_AND_BREAK</a>
+ }</td></tr>
+
 <tr><td colspan="2"><br><h2>Functions</h2></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">enum <a class="el" href="card_8h.html#68efe3b941ff1235ea8cd55bbb0ba123">card_suit_rank</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="card_8h.html#ea48f0f9cb662d6380e97514e0e7df69">get_card_suit_rank</a> (const card *c)</td></tr>
 
@@ -174,7 +178,7 @@
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">enum <a class="el" href="card_8h.html#36ac378c9cdee18d94444923d5f807a7">card_rank</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="card_8h.html#852721734809d03c5af9a410034dfbcd">get_max_rank_of_hand</a> (const card_hand *h)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="card_8h.html#3e157b3d056daf24e91747e4eff7a75a">iterate_hand</a> (card_hand *h, void *arg, <a class="el" href="card_8h.html#b55e3ced6a7c4b217b3fa132e42eaace">card_iterator</a> itr_fn)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="card_8h.html#5f25a62e07cd15558d7f3d649ce03bc7">iterate_hand</a> (card_hand *h, <a class="el" href="card_8h.html#7f1cccd7e267f29de33de07f4fc25260">card_iterator</a> itr_fn)</td></tr>
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="card_8h.html#8b6d69dcf021469ec4cd9528d1b2f678">remove_from_hand</a> (card_hand *h, enum <a class="el" href="card_8h.html#68efe3b941ff1235ea8cd55bbb0ba123">card_suit_rank</a> c)</td></tr>
 
@@ -190,38 +194,15 @@
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="card_8h.html#51636b38ab2d4fe5c63273eaee9e9612">destroy_deck</a> (card_deck **d_ptr)</td></tr>
 
+<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">enum <a class="el" href="card_8h.html#625e20669a3a26dd2243ed4537ec5145">itr_action</a>(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="card_8h.html#7f1cccd7e267f29de33de07f4fc25260">card_iterator</a> )(unsigned long len, unsigned long pos, const card *c)</td></tr>
+
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
 Objects and functions dealing with the 52 cards. 
 <p>
 <dl class="author" compact><dt><b>Author:</b></dt><dd>Tadeus Prastowo &lt;<a href="mailto:eus@member.fsf.org">eus@member.fsf.org</a>&gt; </dd></dl>
 <hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="b55e3ced6a7c4b217b3fa132e42eaace"></a><!-- doxytag: member="card.h::card_iterator" ref="b55e3ced6a7c4b217b3fa132e42eaace" args=")(void *arg, card_hand *h, unsigned long len, unsigned long pos, const card *c)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef int(* <a class="el" href="card_8h.html#b55e3ced6a7c4b217b3fa132e42eaace">card_iterator</a>)(void *arg, card_hand *h, unsigned long len, unsigned long pos, const card *c)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The callback function used to iterated the cards in a hand. The supplied len does not change throughout an iteration. It is the number of cards in the hand before the iteration starts. The supplied pos is monotonically increasing by one. If you want to get the current length or position after inserting or deleting an element during the iteration, you can inquire the supplied hand as well as keeping an external record that is marshalled inside the iterator.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>arg</em>&nbsp;</td><td>your marshalled argument into the iterator. </td></tr>
-    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>h</em>&nbsp;</td><td>the hand that is being iterated </td></tr>
-    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>len</em>&nbsp;</td><td>the total number of cards in this hand. </td></tr>
-    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>pos</em>&nbsp;</td><td>the 0-based position of the current card in the hand. </td></tr>
-    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>c</em>&nbsp;</td><td>the current card under the iterator's view.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>non-zero if you want to stop the iteration early or zero if you do not want to. </dd></dl>
-
-</div>
-</div><p>
 <a class="anchor" name="aab6014c62f3b21a6883c9a00944070a"></a><!-- doxytag: member="card.h::card_sorter" ref="aab6014c62f3b21a6883c9a00944070a" args=")(const card *before, const card *new, const card *after)" -->
 <div class="memitem">
 <div class="memproto">
@@ -290,6 +271,33 @@ The suit of a card. It is guaranteed that the place of the existing enum values 
 
 <p>
 The 52 cards. It is guaranteed that the place of the existing enum values will never change. 
+</div>
+</div><p>
+<a class="anchor" name="625e20669a3a26dd2243ed4537ec5145"></a><!-- doxytag: member="card.h::itr_action" ref="625e20669a3a26dd2243ed4537ec5145" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="card_8h.html#625e20669a3a26dd2243ed4537ec5145">itr_action</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+What the iterator should do. <dl compact><dt><b>Enumerator: </b></dt><dd>
+<table border="0" cellspacing="2" cellpadding="0">
+<tr><td valign="top"><em><a class="anchor" name="625e20669a3a26dd2243ed4537ec514549959dd441dcda75d6898cf2c68fb374"></a><!-- doxytag: member="CONTINUE" ref="625e20669a3a26dd2243ed4537ec514549959dd441dcda75d6898cf2c68fb374" args="" -->CONTINUE</em>&nbsp;</td><td>
+Continue iterating. </td></tr>
+<tr><td valign="top"><em><a class="anchor" name="625e20669a3a26dd2243ed4537ec51459524d094809858b9e4f778763913568a"></a><!-- doxytag: member="BREAK" ref="625e20669a3a26dd2243ed4537ec51459524d094809858b9e4f778763913568a" args="" -->BREAK</em>&nbsp;</td><td>
+Stop iterating. </td></tr>
+<tr><td valign="top"><em><a class="anchor" name="625e20669a3a26dd2243ed4537ec5145a8827262d2ca4c0a8f97ec95fffde8f8"></a><!-- doxytag: member="REMOVE_AND_CONTINUE" ref="625e20669a3a26dd2243ed4537ec5145a8827262d2ca4c0a8f97ec95fffde8f8" args="" -->REMOVE_AND_CONTINUE</em>&nbsp;</td><td>
+Remove the card under the iterator from the hand and continue iterating with the next card. The pos and len values supplied to the callback function in the following iteration will stay constant as in this current iteration reflecting the removal. </td></tr>
+<tr><td valign="top"><em><a class="anchor" name="625e20669a3a26dd2243ed4537ec5145d5db3ad88fdb1b4e0b955fca2dee71e8"></a><!-- doxytag: member="REMOVE_AND_BREAK" ref="625e20669a3a26dd2243ed4537ec5145d5db3ad88fdb1b4e0b955fca2dee71e8" args="" -->REMOVE_AND_BREAK</em>&nbsp;</td><td>
+Remove the card under the iterator from the hand and stop iterating. </td></tr>
+</table>
+</dl>
+
 </div>
 </div><p>
 <hr><h2>Function Documentation</h2>
@@ -746,7 +754,7 @@ Checks whether or not a particular card has not been dealt from the deck.<p>
 
 </div>
 </div><p>
-<a class="anchor" name="3e157b3d056daf24e91747e4eff7a75a"></a><!-- doxytag: member="card.h::iterate_hand" ref="3e157b3d056daf24e91747e4eff7a75a" args="(card_hand *h, void *arg, card_iterator itr_fn)" -->
+<a class="anchor" name="5f25a62e07cd15558d7f3d649ce03bc7"></a><!-- doxytag: member="card.h::iterate_hand" ref="5f25a62e07cd15558d7f3d649ce03bc7" args="(card_hand *h, card_iterator itr_fn)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -759,13 +767,7 @@ Checks whether or not a particular card has not been dealt from the deck.<p>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">void *&nbsp;</td>
-          <td class="paramname"> <em>arg</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="card_8h.html#b55e3ced6a7c4b217b3fa132e42eaace">card_iterator</a>&nbsp;</td>
+          <td class="paramtype"><a class="el" href="card_8h.html#7f1cccd7e267f29de33de07f4fc25260">card_iterator</a>&nbsp;</td>
           <td class="paramname"> <em>itr_fn</em></td><td>&nbsp;</td>
         </tr>
         <tr>
@@ -782,7 +784,6 @@ Iterates a hand invoking the callback function for each iterated card in the han
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>h</em>&nbsp;</td><td>the hand to be iterated. </td></tr>
-    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>arg</em>&nbsp;</td><td>the argument to be marshalled into the callback function. </td></tr>
     <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>itr_fn</em>&nbsp;</td><td>the callback function that will be invoked in each iteration. </td></tr>
   </table>
 </dl>
@@ -1038,8 +1039,33 @@ Returns the rank specified in the string.<p>
 
 </div>
 </div><p>
+<hr><h2>Variable Documentation</h2>
+<a class="anchor" name="7f1cccd7e267f29de33de07f4fc25260"></a><!-- doxytag: member="card.h::card_iterator" ref="7f1cccd7e267f29de33de07f4fc25260" args=")(unsigned long len, unsigned long pos, const card *c)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="card_8h.html#625e20669a3a26dd2243ed4537ec5145">itr_action</a>(* <a class="el" href="card_8h.html#7f1cccd7e267f29de33de07f4fc25260">card_iterator</a>)(unsigned long len, unsigned long pos, const card *c)          </td>
+        </tr>
+      </table>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Thu Feb 4 15:54:04 2010 for RazzSimulation by&nbsp;
+<div class="memdoc">
+
+<p>
+The callback function used to iterate the cards in a hand. Since iterating a data structure with more than one iterators at once where not all iterators is reader clearly is an equivalent of doing multi-threading, it is not allowed by designing the iterator to be very strict. It is a total mess when you iterate a data structure with Iterator1 and use Iterator2 within Iterator1 to remove the iterated element under Iterator1's nose.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>len</em>&nbsp;</td><td>the total number of cards in this hand. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>pos</em>&nbsp;</td><td>the 0-based position of the current card in the hand. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>c</em>&nbsp;</td><td>the current card under the iterator's view.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>the action that the iterator should do next. </dd></dl>
+
+</div>
+</div><p>
+</div>
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Feb 5 20:20:03 2010 for RazzSimulation by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.8 </small></address>
 </body>

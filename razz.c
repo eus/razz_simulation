@@ -140,50 +140,46 @@ complete_hand (card_hand *my_hand, struct decided_cards *decided_cards,
 }
 
 /** Removes a duplicated rank from a hand. */
-int
-duplicated_rank_remover (void *arg, card_hand *h, unsigned long len,
-			 unsigned long pos, const card *c)
+static enum itr_action
+duplicated_rank_remover (unsigned long len, unsigned long pos, const card *c)
 {
-  enum card_rank *prev_rank = arg;
+  static enum card_rank prev_rank;
   enum card_rank curr_rank = get_card_rank (c);
 
   if (pos == 0)
     {
-      *prev_rank = curr_rank;
-      return 0;
+      prev_rank = curr_rank;
+      return CONTINUE;
     }
 
-  if (*prev_rank == curr_rank)
+  if (prev_rank == curr_rank)
     {
-      remove_from_hand (h, get_card_suit_rank (c));
-      return 0;
+      return REMOVE_AND_CONTINUE;
     }
 
-  *prev_rank = curr_rank;
+  prev_rank = curr_rank;
 
-  return 0;
+  return CONTINUE;
 }
 
 /** Keeps only the first five cards in a hand. */
-int
-length_trimmer (void *arg, card_hand *h, unsigned long len,
-		unsigned long pos, const card *c)
+static enum itr_action
+length_trimmer (unsigned long len, unsigned long pos, const card *c)
 {
   if (pos >= 5)
     {
-      remove_from_hand (h, get_card_suit_rank (c));
+      return REMOVE_AND_CONTINUE;
     }
 
-  return 0;
+  return CONTINUE;
 }
 
 /** Prints all cards in the hand. */
-int
-card_printer (void *arg, card_hand *h, unsigned long len,
-	      unsigned long pos, const card *c)
+static enum itr_action
+card_printer (unsigned long len, unsigned long pos, const card *c)
 {
   printf ("%4s", cardtostr (get_card_suit_rank (c)));
-  return 0;
+  return CONTINUE;
 }
 
 /**
@@ -199,16 +195,16 @@ card_printer (void *arg, card_hand *h, unsigned long len,
 int
 is_rank_desirable (card_hand *hand, enum card_rank desired_rank)
 {
-  enum card_rank prev_rank;
+  enum card_rank r;
   unsigned long cards_count;
 
 #ifndef NDEBUG
-  iterate_hand (hand, NULL, card_printer);
+  iterate_hand (hand, card_printer);
 #endif
-  iterate_hand (hand, &prev_rank, duplicated_rank_remover);
+  iterate_hand (hand, duplicated_rank_remover);
 #ifndef NDEBUG
   printf (" -> ");
-  iterate_hand (hand, NULL, card_printer);
+  iterate_hand (hand, card_printer);
 #endif
 
   cards_count = count_cards_in_hand (hand);
@@ -220,7 +216,8 @@ is_rank_desirable (card_hand *hand, enum card_rank desired_rank)
       return 0;
     }
 
-  iterate_hand (hand, NULL, length_trimmer);
+  iterate_hand (hand, length_trimmer);
+  r = get_max_rank_of_hand (hand);
 
 #ifndef NDEBUG
   if (cards_count > 5)
@@ -232,10 +229,9 @@ is_rank_desirable (card_hand *hand, enum card_rank desired_rank)
       printf ("\t\t");
     }
   printf ("-> ");
-  iterate_hand (hand, NULL, card_printer);
-  printf (": %2s [%2s]\n",
-	  ranktostr (get_max_rank_of_hand (hand)),
-	  ranktostr (desired_rank));
+  iterate_hand (hand, card_printer);
+  printf (": %2s\n",
+	  ranktostr (r));
 #endif
 
   if (get_max_rank_of_hand (hand) == desired_rank)

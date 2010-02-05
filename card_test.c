@@ -30,26 +30,60 @@ static enum card_suit_rank seed3_dealing_order[] = {
   HEART_5, SPADE_4, SPADE_10, CLUB_8,
 };
 
-static int
-test_sort_card_by_rank (void *arg, card_hand *h, unsigned long len,
-			unsigned long pos, const card *c)
+static enum itr_action
+test_sort_card_by_rank_1 (unsigned long len, unsigned long pos, const card *c)
 {
-  enum card_suit_rank *test_data = arg;
+  static const enum card_suit_rank test_data[] = {
+    SPADE_ACE, DIAMOND_2, CLUB_2, DIAMOND_6, HEART_9, HEART_10, HEART_Q,
+  };
 
   assert (get_card_suit_rank (c) == test_data[pos]);
 
-  return 0;
+  return CONTINUE;
 }
 
-static int
-test_empty_hand (void *arg, card_hand *h, unsigned long len,
-		 unsigned long pos, const card *c)
+static enum itr_action
+test_sort_card_by_rank_2 (unsigned long len, unsigned long pos, const card *c)
 {
-  int *dirty = arg;
+  static const enum card_suit_rank test_data[] = {
+    SPADE_ACE, DIAMOND_2, CLUB_2, HEART_9, HEART_10, HEART_Q,
+  };
 
-  *dirty = 1;
+  assert (get_card_suit_rank (c) == test_data[pos]);
 
-  return 0;
+  return CONTINUE;
+}
+
+static enum itr_action
+test_sort_card_by_rank_3 (unsigned long len, unsigned long pos, const card *c)
+{
+  static const enum card_suit_rank test_data[] = {
+    SPADE_ACE, DIAMOND_2, CLUB_2, HEART_9, HEART_10
+  };
+
+  assert (get_card_suit_rank (c) == test_data[pos]);
+
+  return CONTINUE;
+}
+
+static enum itr_action
+test_sort_card_by_rank_4 (unsigned long len, unsigned long pos, const card *c)
+{
+  static const enum card_suit_rank test_data[] = {
+    HEART_9, HEART_10
+  };
+
+  assert (get_card_suit_rank (c) == test_data[pos]);
+
+  return CONTINUE;
+}
+
+static enum itr_action
+test_empty_hand (unsigned long len, unsigned long pos, const card *c)
+{
+  assert (0);
+
+  return CONTINUE;
 }
 
 int
@@ -218,38 +252,26 @@ main (int argc, char **argv, char **envp)
   assert (count_cards_in_hand (h) == 7);
   assert (get_max_of_hand (h) == 7);
   assert (get_max_rank_of_hand (h) == Q);
-
-  enum card_suit_rank test_data_1[] = {
-    SPADE_ACE, DIAMOND_2, CLUB_2, DIAMOND_6, HEART_9, HEART_10, HEART_Q,
-  };
-  iterate_hand (h, test_data_1, test_sort_card_by_rank);
+  iterate_hand (h, test_sort_card_by_rank_1);
 
   remove_from_hand (h, DIAMOND_6);
   assert (count_cards_in_hand (h) == 6);
   assert (get_max_of_hand (h) == 7);
   assert (get_max_rank_of_hand (h) == Q);
-  enum card_suit_rank test_data_2[] = {
-    SPADE_ACE, DIAMOND_2, CLUB_2, HEART_9, HEART_10, HEART_Q,
-  };
-  iterate_hand (h, test_data_2, test_sort_card_by_rank);
+  iterate_hand (h, test_sort_card_by_rank_2);
 
   remove_from_hand (h, HEART_Q);
   assert (count_cards_in_hand (h) == 5);
   assert (get_max_of_hand (h) == 7);
   assert (get_max_rank_of_hand (h) == R10);
-  enum card_suit_rank test_data_3[] = {
-    SPADE_ACE, DIAMOND_2, CLUB_2, HEART_9, HEART_10
-  };
-  iterate_hand (h, test_data_3, test_sort_card_by_rank);
+  iterate_hand (h, test_sort_card_by_rank_3);
 
   reset_hand (h);
   assert (count_cards_in_hand (h) == 0);
   assert (get_max_of_hand (h) == 7);
   assert (get_max_rank_of_hand (h) == INVALID_RANK);
   remove_from_hand (h, HEART_Q);
-  int dirty = 0;
-  iterate_hand (h, &dirty, test_empty_hand);
-  assert (!dirty);
+  iterate_hand (h, test_empty_hand);
   
   destroy_hand (&h);
   assert (h == NULL);

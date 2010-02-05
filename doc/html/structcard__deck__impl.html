@@ -24,47 +24,47 @@
 <h1>card_deck Struct Reference</h1><!-- doxytag: class="card_deck_impl" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct <a class="el" href="structcard__collection.html">card_collection</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcard__deck__impl.html#945d33014c03c458ec482c08ca9911db">dealt_cards</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">char&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcard__deck__impl.html#6aeee2a88a471f0a1705883b9778dd08">card_count</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct <a class="el" href="structcard__collection.html">card_collection</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcard__deck__impl.html#42c88ff9ff5e64bfc4b37df09bd4d28f">cards</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">card&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcard__deck__impl.html#7095918f1f7482ad2d18565d79388ec3">cards</a> [CARD_COUNT]</td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
 A deck of cards. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="42c88ff9ff5e64bfc4b37df09bd4d28f"></a><!-- doxytag: member="card_deck_impl::cards" ref="42c88ff9ff5e64bfc4b37df09bd4d28f" args="" -->
+<a class="anchor" name="6aeee2a88a471f0a1705883b9778dd08"></a><!-- doxytag: member="card_deck_impl::card_count" ref="6aeee2a88a471f0a1705883b9778dd08" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">struct <a class="el" href="structcard__collection.html">card_collection</a>* card_deck::cards<code> [read]</code>          </td>
+          <td class="memname">char card_deck::card_count          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The cards in deck. 
+The number of cards in the deck. 
 </div>
 </div><p>
-<a class="anchor" name="945d33014c03c458ec482c08ca9911db"></a><!-- doxytag: member="card_deck_impl::dealt_cards" ref="945d33014c03c458ec482c08ca9911db" args="" -->
+<a class="anchor" name="7095918f1f7482ad2d18565d79388ec3"></a><!-- doxytag: member="card_deck_impl::cards" ref="7095918f1f7482ad2d18565d79388ec3" args="[CARD_COUNT]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">struct <a class="el" href="structcard__collection.html">card_collection</a>* card_deck::dealt_cards<code> [read]</code>          </td>
+          <td class="memname">card card_deck::cards[CARD_COUNT]          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Cards that have been dealt. 
+The cards in the deck. 
 </div>
 </div><p>
 <hr>The documentation for this struct was generated from the following file:<ul>
 <li>card.c</ul>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Thu Feb 4 15:54:04 2010 for RazzSimulation by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Feb 5 20:20:03 2010 for RazzSimulation by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.8 </small></address>
 </body>

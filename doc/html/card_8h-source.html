@@ -141,40 +141,49 @@
 <a name="l00283"></a>00283 <span class="keyword">enum</span> <a class="code" href="card_8h.html#36ac378c9cdee18d94444923d5f807a7">card_rank</a>
 <a name="l00284"></a>00284 get_max_rank_of_hand (<span class="keyword">const</span> card_hand *h);
 <a name="l00285"></a>00285 
-<a name="l00304"></a><a class="code" href="card_8h.html#b55e3ced6a7c4b217b3fa132e42eaace">00304</a> <span class="keyword">typedef</span> int (*<a class="code" href="card_8h.html#b55e3ced6a7c4b217b3fa132e42eaace">card_iterator</a>) (<span class="keywordtype">void</span> *arg, card_hand *h, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> len, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> pos,
-<a name="l00305"></a>00305                               <span class="keyword">const</span> card *c);
-<a name="l00306"></a>00306 
-<a name="l00315"></a>00315 <span class="keywordtype">void</span>
-<a name="l00316"></a>00316 iterate_hand (card_hand *h, <span class="keywordtype">void</span> *arg, <a class="code" href="card_8h.html#b55e3ced6a7c4b217b3fa132e42eaace">card_iterator</a> itr_fn);
-<a name="l00317"></a>00317 
-<a name="l00324"></a>00324 <span class="keywordtype">void</span>
-<a name="l00325"></a>00325 remove_from_hand (card_hand *h, <span class="keyword">enum</span> <a class="code" href="card_8h.html#68efe3b941ff1235ea8cd55bbb0ba123">card_suit_rank</a> c);
-<a name="l00326"></a>00326 
-<a name="l00337"></a>00337 <span class="keywordtype">void</span>
-<a name="l00338"></a>00338 destroy_hand (card_hand **h_ptr);
-<a name="l00339"></a>00339 
-<a name="l00348"></a>00348 <span class="keywordtype">int</span>
-<a name="l00349"></a>00349 is_card_in_deck (<span class="keyword">enum</span> <a class="code" href="card_8h.html#68efe3b941ff1235ea8cd55bbb0ba123">card_suit_rank</a> c, <span class="keyword">const</span> card_deck *d);
-<a name="l00350"></a>00350 
-<a name="l00361"></a>00361 <span class="keyword">const</span> card *
-<a name="l00362"></a>00362 deal_from_deck (card_deck *d);
-<a name="l00363"></a>00363 
-<a name="l00373"></a>00373 <span class="keywordtype">void</span>
-<a name="l00374"></a>00374 strip_card_from_deck (<span class="keyword">enum</span> <a class="code" href="card_8h.html#68efe3b941ff1235ea8cd55bbb0ba123">card_suit_rank</a> c, card_deck *d);
-<a name="l00375"></a>00375 
-<a name="l00382"></a>00382 card_deck *
-<a name="l00383"></a>00383 create_shuffled_deck (<span class="keywordtype">void</span>);
-<a name="l00384"></a>00384 
-<a name="l00394"></a>00394 <span class="keywordtype">void</span>
-<a name="l00395"></a>00395 destroy_deck (card_deck **d_ptr);
-<a name="l00396"></a>00396 
-<a name="l00397"></a>00397 <span class="preprocessor">#ifdef __cplusplus</span>
-<a name="l00398"></a>00398 <span class="preprocessor"></span>}
-<a name="l00399"></a>00399 <span class="preprocessor">#endif</span>
-<a name="l00400"></a>00400 <span class="preprocessor"></span>
-<a name="l00401"></a>00401 <span class="preprocessor">#endif </span><span class="comment">/* CARD_H */</span>
+<a name="l00287"></a><a class="code" href="card_8h.html#625e20669a3a26dd2243ed4537ec5145">00287</a> <span class="keyword">enum</span> <a class="code" href="card_8h.html#625e20669a3a26dd2243ed4537ec5145">itr_action</a>
+<a name="l00288"></a>00288   {
+<a name="l00289"></a><a class="code" href="card_8h.html#625e20669a3a26dd2243ed4537ec514549959dd441dcda75d6898cf2c68fb374">00289</a>     <a class="code" href="card_8h.html#625e20669a3a26dd2243ed4537ec514549959dd441dcda75d6898cf2c68fb374">CONTINUE</a>, 
+<a name="l00290"></a><a class="code" href="card_8h.html#625e20669a3a26dd2243ed4537ec51459524d094809858b9e4f778763913568a">00290</a>     <a class="code" href="card_8h.html#625e20669a3a26dd2243ed4537ec51459524d094809858b9e4f778763913568a">BREAK</a>, 
+<a name="l00291"></a><a class="code" href="card_8h.html#625e20669a3a26dd2243ed4537ec5145a8827262d2ca4c0a8f97ec95fffde8f8">00291</a>     <a class="code" href="card_8h.html#625e20669a3a26dd2243ed4537ec5145a8827262d2ca4c0a8f97ec95fffde8f8">REMOVE_AND_CONTINUE</a>, 
+<a name="l00298"></a><a class="code" href="card_8h.html#625e20669a3a26dd2243ed4537ec5145d5db3ad88fdb1b4e0b955fca2dee71e8">00298</a>     <a class="code" href="card_8h.html#625e20669a3a26dd2243ed4537ec5145d5db3ad88fdb1b4e0b955fca2dee71e8">REMOVE_AND_BREAK</a>, 
+<a name="l00302"></a>00302   };
+<a name="l00303"></a>00303 
+<a name="l00319"></a>00319 <span class="keyword">typedef</span> <span class="keyword">enum</span> <a class="code" href="card_8h.html#625e20669a3a26dd2243ed4537ec5145">itr_action</a> (*<a class="code" href="card_8h.html#7f1cccd7e267f29de33de07f4fc25260">card_iterator</a>) (<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> len,
+<a name="l00320"></a>00320                                           <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> pos,
+<a name="l00321"></a>00321                                           <span class="keyword">const</span> card *c);
+<a name="l00322"></a>00322 
+<a name="l00331"></a>00331 <span class="keywordtype">void</span>
+<a name="l00332"></a>00332 iterate_hand (card_hand *h, <a class="code" href="card_8h.html#7f1cccd7e267f29de33de07f4fc25260">card_iterator</a> itr_fn);
+<a name="l00333"></a>00333 
+<a name="l00340"></a>00340 <span class="keywordtype">void</span>
+<a name="l00341"></a>00341 remove_from_hand (card_hand *h, <span class="keyword">enum</span> <a class="code" href="card_8h.html#68efe3b941ff1235ea8cd55bbb0ba123">card_suit_rank</a> c);
+<a name="l00342"></a>00342 
+<a name="l00353"></a>00353 <span class="keywordtype">void</span>
+<a name="l00354"></a>00354 destroy_hand (card_hand **h_ptr);
+<a name="l00355"></a>00355 
+<a name="l00364"></a>00364 <span class="keywordtype">int</span>
+<a name="l00365"></a>00365 is_card_in_deck (<span class="keyword">enum</span> <a class="code" href="card_8h.html#68efe3b941ff1235ea8cd55bbb0ba123">card_suit_rank</a> c, <span class="keyword">const</span> card_deck *d);
+<a name="l00366"></a>00366 
+<a name="l00377"></a>00377 <span class="keyword">const</span> card *
+<a name="l00378"></a>00378 deal_from_deck (card_deck *d);
+<a name="l00379"></a>00379 
+<a name="l00389"></a>00389 <span class="keywordtype">void</span>
+<a name="l00390"></a>00390 strip_card_from_deck (<span class="keyword">enum</span> <a class="code" href="card_8h.html#68efe3b941ff1235ea8cd55bbb0ba123">card_suit_rank</a> c, card_deck *d);
+<a name="l00391"></a>00391 
+<a name="l00398"></a>00398 card_deck *
+<a name="l00399"></a>00399 create_shuffled_deck (<span class="keywordtype">void</span>);
+<a name="l00400"></a>00400 
+<a name="l00410"></a>00410 <span class="keywordtype">void</span>
+<a name="l00411"></a>00411 destroy_deck (card_deck **d_ptr);
+<a name="l00412"></a>00412 
+<a name="l00413"></a>00413 <span class="preprocessor">#ifdef __cplusplus</span>
+<a name="l00414"></a>00414 <span class="preprocessor"></span>}
+<a name="l00415"></a>00415 <span class="preprocessor">#endif</span>
+<a name="l00416"></a>00416 <span class="preprocessor"></span>
+<a name="l00417"></a>00417 <span class="preprocessor">#endif </span><span class="comment">/* CARD_H */</span>
 </pre></div></div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Thu Feb 4 15:54:04 2010 for RazzSimulation by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Feb 5 20:20:03 2010 for RazzSimulation by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.8 </small></address>
 </body>

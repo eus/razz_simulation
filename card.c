@@ -375,27 +375,39 @@ destroy_collection_entry (struct card_collection **entry, payload_freer freer)
 }
 
 /**
- * Reclaims the memory space that was allocated for the entry as well as
- * setting the pointer to NULL as a safe guard. Passing a pointer to NULL is,
- * safe but not a NULL pointer. A function callback to free the payload should
- * be provided unless the payload should not be freed.
+ * Reclaims the memory space that was allocated for the entry under an iteration.
+ * Entry and head must point to valid entries in a collection. Upon completion,
+ * invocation of iterate_collection() on the entry will continue with the next
+ * entry. If head gets removed, head will be adjusted to point to the next entry
+ * in the chain. A function callback to free the payload should be provided
+ * unless the payload should not be freed.
  *
+ * @param [in] head the pointer pointing to the head of the collection.
  * @param [in] entry the pointer pointing to the entry to be freed.
  * @param [in] freer the callback function used to free the payload of the entry
  *                   or NULL if the payload should not be freed.
  */
 static void
-remove_from_collection (struct card_collection **entry, payload_freer freer)
+remove_from_collection_under_itr (struct card_collection **head,
+				  struct card_collection **entry,
+				  payload_freer freer)
 {
-  if (*entry == NULL)
+  struct card_collection *entry_to_remove = NULL;
+  int is_entry_head = (*head == *entry);
+
+  detach_from_collection (*entry);
+  entry_to_remove = *entry;
+  *entry = (*entry)->prev;
+  if (*entry == entry_to_remove)
     {
-      return;
+      *entry = NULL;
     }
+  destroy_collection_entry (&entry_to_remove, freer);
 
-  (*entry)->next->prev = (*entry)->prev;
-  (*entry)->prev->next = (*entry)->next;
-
-  destroy_collection_entry (entry, freer);
+  if (is_entry_head && *head != *entry) // the head gets deleted;
+    {
+      *head = ((*entry == NULL) ? NULL : (*entry)->next);
+    }
 }
 
 /**
@@ -782,17 +794,50 @@ get_max_rank_of_hand (const card_hand *h)
   return cr;
 }
 
+/**
+ * Removes an entry in a hand under an iteration.
+ *
+ * @param [in] h the hand from which the entry is to be removed.
+ * @param [in] itr the iterator that is iterating the hand.
+ * @param [in] pos the iteration position to be adjusted
+ *                 (set to NULL if there is need for one)
+ */
+static void
+remove_from_hand_under_itr (card_hand *h, struct card_collection **itr,
+			    unsigned long *pos)
+{
+  remove_from_collection_under_itr (&h->cards, itr, NULL);
+
+  h->len--;
+  if (pos != NULL)
+    {
+      *pos -= 1;
+    }
+}
+
 void
-iterate_hand (card_hand *h, void *arg, card_iterator itr_fn)
+iterate_hand (card_hand *h, card_iterator itr_fn)
 {
   struct card_collection *itr = NULL;
   unsigned long len = h->len;
   unsigned long pos = 0;
+  int is_stopped = 0;
 
-  while (iterate_collection (h->cards, &itr))
+  while (!is_stopped && iterate_collection (h->cards, &itr))
     {
-      if (itr_fn (arg, h, len, pos, itr->c))
+      switch (itr_fn (h->len, pos, itr->c))
 	{
+	case CONTINUE:
+	  break;
+	case BREAK:
+	  is_stopped = 1;
+	  break;
+	case REMOVE_AND_CONTINUE:
+	  remove_from_hand_under_itr (h, &itr, &pos);
+	  break;
+	case REMOVE_AND_BREAK:
+	  remove_from_hand_under_itr (h, &itr, &pos);
+	  is_stopped = 1;
 	  break;
 	}
       pos++;
@@ -809,11 +854,7 @@ remove_from_hand (card_hand *h, enum card_suit_rank c)
     {
       if (get_card_suit_rank (itr->c) == c)
 	{
-	  detach_from_collection (itr);
-	  entry_to_remove = itr;
-	  itr = itr->prev;
-	  destroy_collection_entry (&entry_to_remove, NULL);
-	  h->len--;
+	  remove_from_hand_under_itr (h, &itr, NULL);
 	}
     }
 }

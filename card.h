@@ -283,37 +283,53 @@ get_max_of_hand (const card_hand *h);
 enum card_rank
 get_max_rank_of_hand (const card_hand *h);
 
+/** What the iterator should do. */
+enum itr_action
+  {
+    CONTINUE, /**< Continue iterating. */
+    BREAK, /**< Stop iterating. */
+    REMOVE_AND_CONTINUE, /**<
+			  * Remove the card under the iterator from the hand
+			  * and continue iterating with the next card. The
+			  * pos and len values supplied to the callback function
+			  * in the following iteration will stay constant as in
+			  * this current iteration reflecting the removal.
+			  */
+    REMOVE_AND_BREAK, /**<
+		       * Remove the card under the iterator from the hand
+		       * and stop iterating.
+		       */
+  };
+
 /**
- * The callback function used to iterated the cards in a hand.
- * The supplied len does not change throughout an iteration. It is the number of
- * cards in the hand before the iteration starts.
- * The supplied pos is monotonically increasing by one.
- * If you want to get the current length or position after inserting or deleting
- * an element during the iteration, you can inquire the supplied hand as well as
- * keeping an external record that is marshalled inside the iterator.
+ * The callback function used to iterate the cards in a hand.
+ * Since iterating a data structure with more than one iterators at once
+ * where not all iterators is reader clearly is an equivalent of doing
+ * multi-threading, it is not allowed by designing the iterator to be very
+ * strict. It is a total mess when you iterate a data structure with
+ * Iterator1 and use Iterator2 within Iterator1 to remove the iterated
+ * element under Iterator1's nose.
  *
- * @param [in] arg your marshalled argument into the iterator.
- * @param [in] h the hand that is being iterated
  * @param [in] len the total number of cards in this hand.
  * @param [in] pos the 0-based position of the current card in the hand.
  * @param [in] c the current card under the iterator's view.
  *
- * @return non-zero if you want to stop the iteration early or zero if you do
- *         not want to.
+ * @return the action that the iterator should do next.
  */
-typedef int (*card_iterator) (void *arg, card_hand *h, unsigned long len, unsigned long pos,
-			      const card *c);
+typedef enum itr_action (*card_iterator) (unsigned long len,
+					  unsigned long pos,
+					  const card *c);
 
 /**
  * Iterates a hand invoking the callback function for each iterated card in the
  * hand.
  *
  * @param [in] h the hand to be iterated.
- * @param [in] arg the argument to be marshalled into the callback function.
- * @param [in] itr_fn the callback function that will be invoked in each iteration.
+ * @param [in] itr_fn the callback function that will be invoked in each
+ *                    iteration.
  */
 void
-iterate_hand (card_hand *h, void *arg, card_iterator itr_fn);
+iterate_hand (card_hand *h, card_iterator itr_fn);
 
 /**
  * Removes all cards having the same suit and rank from a card hand.
